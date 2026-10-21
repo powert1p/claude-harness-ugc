@@ -1,0 +1,26 @@
+# Whitelist: в ~/.claude вперемешку лежат харнес и рантайм Claude Code
+# (транскрипты, кэши, креды). Игнорим всё, пускаем только харнес —
+# иначе любой новый каталог с секретами уедет в репо молча.
+/*
+!/.gitignore
+!/README.md
+!/install.sh
+!/CLAUDE.md
+!/SOUL.md
+!/USER.md
+!/settings.json
+!/hooks/
+!/skills/
+!/agents/
+!/commands/
+!/output-styles/
+
+# auto-memory: только заметки, транскрипты сессий мимо
+!/projects/
+/projects/*
+!/projects/*/
+/projects/*/*
+!/projects/*/memory/
+
+**/__pycache__/
+**/*.log

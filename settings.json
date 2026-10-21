@@ -1,0 +1,47 @@
+{
+  "model": "opus",
+  "modelSettings": {
+    "claude-opus-5-5": { "effortLevel": "high" }
+  },
+  "permissions": {
+    "defaultMode": "bypassPermissions",
+    "deny": [
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Bash(sudo *)"
+    ]
+  },
+  "skipDangerousModePermissionPrompt": true,
+  "extraKnownMarketplaces": {
+    "humanizer": { "source": { "source": "github", "repo": "blader/humanizer" } }
+  },
+  "enabledPlugins": {
+    "humanizer@humanizer": true
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          { "type": "command", "command": "bash \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/hooks/soul-inject.sh\"", "timeout": 10 },
+          { "type": "command", "command": "bash \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/hooks/sync.sh\"", "timeout": 5 }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "bash \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/hooks/block-destructive.sh\"", "timeout": 5 }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          { "type": "command", "command": "bash \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/hooks/sync.sh\"", "timeout": 5 }
+        ]
+      }
+    ]
+  }
+}
