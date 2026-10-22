@@ -1,9 +1,8 @@
 #!/bin/bash
 # install.sh — ставит харнес в ~/.claude поверх того, что Claude Code уже создал.
-# Запуск из склонированной копии: bash /tmp/h/install.sh
+# Репо открытое: вход в GitHub не нужен. Запуск из склонированной копии: bash /tmp/h/install.sh
 # Повторный запуск безопасен: уже установленный харнес просто обновится.
 set -euo pipefail
-export PATH="$HOME/.local/bin:$PATH"
 
 SRC="$(cd "$(dirname "$0")" && pwd)"
 C="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
@@ -25,10 +24,11 @@ else
   git -C "$C" checkout -f -q main
 fi
 
-chmod +x "$C"/hooks/*.sh
+# Профиль — только на её Маке: USER.md не в репо, репо открытое
+[ -f "$C/USER.md" ] || cp "$C/USER.template.md" "$C/USER.md"
 
-# Push без вопросов: git берёт токен у gh
-command -v gh >/dev/null && gh auth setup-git >/dev/null 2>&1 || echo "WARN: gh не залогинен — синк не будет пушить"
+chmod +x "$C"/hooks/*.sh
+# Локальные коммиты синка требуют имени автора
 git -C "$C" config user.name >/dev/null || git -C "$C" config user.name "$(id -F 2>/dev/null || whoami)"
 git -C "$C" config user.email >/dev/null || git -C "$C" config user.email "$(whoami)@$(hostname -s).local"
 

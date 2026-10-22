@@ -1,8 +1,9 @@
 #!/bin/bash
-# sync.sh — синк харнеса с GitHub без участия владелицы.
-# Зовётся на SessionStart (подтянуть правки Есета) и на Stop (сохранить её правки).
-# Работа уходит в фон и хук возвращается сразу: Stop срабатывает на каждом ходе,
-# ожидание сети здесь тормозило бы каждый ответ.
+# sync.sh — подтягивает обновления харнеса от Есета без участия владелицы.
+# Репо открытое и ставится без входа в GitHub, поэтому синк только тянет: push нет.
+# Её правки коммитятся локально — история на Маке, откат при поломке.
+# Зовётся на SessionStart и Stop; работа в фоне, хук возвращается сразу:
+# Stop срабатывает на каждом ходе, ожидание сети тормозило бы каждый ответ.
 # Конфликт rebase → откат, флаг state/sync-conflict; soul-inject попросит агента починить.
 
 C="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
@@ -17,7 +18,7 @@ nohup bash -c '
   trap "rmdir state/sync.lock" EXIT
   echo "[$(date "+%F %T")] sync"
   git add -A
-  git diff --cached --quiet || git commit -qm "sync: $(date "+%F %H:%M")"
+  git diff --cached --quiet || git commit -qm "local: $(date "+%F %H:%M")"
   if ! git pull -q --rebase --autostash; then
     git rebase --abort 2>/dev/null
     date > state/sync-conflict
@@ -25,7 +26,6 @@ nohup bash -c '
     exit 0
   fi
   rm -f state/sync-conflict
-  git push -q || echo "[push failed]"
 ' _ "$C" >>"$C/logs/sync.log" 2>&1 </dev/null &
 disown 2>/dev/null
 exit 0
